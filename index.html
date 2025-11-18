@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTTG</title>
+<style>
+/* === Reset cơ bản === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+html { font-size: 16px; }
+@media (max-width:480px) { html { font-size: 13px; } }
+body { background: #f5f5f5; line-height: 1.5; color: #333; }
+
+/* === Header === */
+header {
+  width: 100%;
+  background: #212121;
+  box-shadow: 0 4px 8px rgba(196,196,196,0.6);
+}
+.header-container {
+  position: relative;
+  max-width: 1000px;
+  margin: auto;
+  height: 60px;
+}
+
+.nav-left { 
+  position: absolute; 
+  left: 10px; 
+  top: 50%; 
+  transform: translateY(-50%);
+}
+.nav-center { 
+  position: absolute; 
+  left: 50%; 
+  top: 50%; 
+  transform: translate(-50%, -50%);
+}
+
+.nav-left a, .nav-center a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav-left a:hover, .nav-center a:hover {
+  text-decoration: none;
+}
+
+/* === Footer === */
+footer {
+  width: 100%;
+  background: #212121;
+  color: #fff;
+  text-align: center;
+  padding: 12px 0;
+  margin-top: 20px;
+}
+
+/* === Action Buttons chung === */
+.action-buttons { display: flex; gap: 8px; margin: 10px auto; justify-content: flex-end; max-width: 1000px; }
+.btn-action {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px;
+  background: #1D4ED8; color: #fff;
+  border: none; border-radius: 4px;
+  font-weight: bold; font-size: 1rem;
+  cursor: pointer; transition: 0.2s;
+}
+.btn-action:hover { background: #2563EB; }
+.btn-action:active { transform: scale(0.98); }
+
+/* === Container chính === */
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.section { margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+label { display: block; font-weight: bold; margin-bottom: 6px; }
+
+.input-with-unit { position: relative; margin-bottom: 12px; }
+.input-with-unit span {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  pointer-events: none;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+input:focus, select:focus, textarea:focus { border-color: #4caf50; outline: none; }
+
+/* === Input bị khóa (không cho click, rê chuột) === */
+.input-locked {
+  background-color: #e5e7eb;
+  color: #6b7280;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* === Button nhóm === */
+.button-group { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.button-group button { flex: 1; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+.button-group button:active { transform: scale(0.98); }
+.btn-view { background:#2563EB; color:#fff; }
+.btn-view:hover { background:#1E40AF; }
+.btn-fee { background:#F06310; color:#fff; }
+.btn-fee:hover { background:#D35400; }
+.btn-delete { background:#DC2626; color:#fff; }
+.btn-delete:hover { background:#B91C1C; }
+
+/* === Button note === */
+.button-note-box { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.button-note { padding: 10px 16px; border-left: 4px solid; border-radius: 6px; font-weight: bold; background: #F3F4F6; font-size: 1rem; }
+.button-note .amount { font-weight: bold; color: #DC2626; }
+.button-note .amount1 { font-weight: bold; color: #0891B2; }
+.btn-view-note { border-color:#2563EB; }
+.btn-fee-note { border-color:#F06310; }
+.btn-delete-note { border-color:#DC2626; }
+
+/* === Error notes === */
+.error-note, .error-note1 {
+  background: #FEE2E2;
+  border-left: 4px solid #DC2626;
+  padding: 10px 16px;
+  border-radius: 6px;
+  color: #991B3B;
+  display: none;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+.error-empty, .error-prepaid { display: block; }
+
+/* === Result box & Insurance === */
+.result-box { background: #F3F4F6; border-left: 4px solid #1D4ED8; padding: 16px 20px; border-radius: 6px; margin-top: 8px; line-height: 1.7; font-size: 1rem; }
+.result-box .percent { font-weight: bold; color: #3243BF; }
+.result-box .amount { font-weight: bold; color: #DC2626; }
+.result-box .amount1 { font-weight: bold; color: #0891B2; }
+.insurance-note { display: flex; align-items: flex-start; background: #F0FDF4; border-left: 4px solid #10B981; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; gap: 8px; font-size: 1rem; }
+
+/* === Table === */
+.table-container { overflow-x: auto; margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; table-layout: auto; text-align: center; }
+th, td { border: 1px solid #ccc; padding: 6px 10px; word-wrap: break-word; font-size: 1rem; }
+th { background: #f3f4f6; font-weight: bold; }
+tr:nth-child(even) { background: #F9FAFB; }
+tbody tr:last-child { background: #dcfce7; font-weight: bold; color: #166534; }
+
+/* === Responsive === */
+@media (max-width:480px) {
+  th, td { padding: 4px 2px; }
+  html { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="nav-left">
+      <a href="#" id="navHome">☰</a>
+    </div>
+    <div class="nav-center">
+      <a href="#" id="navBTTG">BẢNG TÍNH TRẢ GÓP</a>
+    </div>
+  </div>
+</header>
+
+<!-- Nút In & Share -->
+<div class="action-buttons">
+  <button class="btn-action" id="btnPrint">In</button>
+  <button class="btn-action" id="btnShare">Share</button>
+</div>
+
+<div class="container">
+  <!-- 1. Khách hàng + Sản phẩm + trả trước -->
+  <div class="section">
+    <div class="form-group">
+      <label for="customerName">Tên khách hàng</label>
+      <input type="text" id="customerName" placeholder="Họ và Tên">
+    </div>
+    <div class="form-group">
+      <label for="productName">Tên sản phẩm</label>
+      <input type="text" id="productName" placeholder="Sản phẩm">
+    </div>
+    <div class="form-group">
+      <label for="productPrice">Giá sản phẩm</label>
+      <div class="input-with-unit">
+        <input type="text" id="productPrice" placeholder="0" inputmode="numeric">
+        <span>VNĐ</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="prepaidAmount">Trả trước</label>
+      <div class="input-with-unit">
+        <input type="text" id="prepaidAmount" placeholder="0" inputmode="numeric">
+        <span>VNĐ</span>
+      </div>
+    </div>
+    <div class="button-group">
+      <button id="btnCalculate">DP</button>
+    </div>
+    <div class="error-note1 error-empty" id="errorProductPrice"><!--Vui lòng nhập giá sản phẩm!--></div>
+    <div class="error-note1 error-prepaid" id="errorPrepaid"><!--Trả trước không được lớn hơn giá sản phẩm!--></div>
+    <div class="result-box" id="resultPrepaid">
+<!--      <div>Trả trước: <span class="percent">10%</span></div>
+      <div>Còn lại: <span class="amount">1.000.000 VNĐ</span></div> -->
+    </div>
+  </div>
+
+  <!-- 2. Bảo hiểm -->
+  <div class="section">
+    <div class="form-group">
+      <label for="insurance">Bảo hiểm khoản vay</label>
+      <select id="insurance">
+        <option value="6.6">6,6%</option>
+        <option value="7">7%</option>
+        <option value="0">Không</option>
+      </select>
+    </div>
+    <div class="insurance-note">
+      <div class="note-text">BHKV = Khoản vay (LA) * Hệ số bảo hiểm.</div>
+    </div>
+    <div class="button-group">
+      <button id="btnAddInsurance">BHKV</button>
+    </div>
+    <div class="error-note1 error-empty" id="errorInsurance"><!--Vui lòng tính Trả trước trước khi thêm BH--></div>
+    <div class="result-box" id="resultInsurance">
+<!--      <div>Còn lại: <span class="amount">1.000.000 VNĐ</span></div>
+      <div>Đã thêm bảo hiểm: <span class="percent">6.6%</span></div>
+      <div>Phí bảo hiểm: <span class="amount1">+66.000 VNĐ</span></div>
+      <div>Tổng vay mới: <span class="amount">1.066.000 VNĐ</span></div> -->
+    </div>
+  </div>
+
+  <!-- 3. Thông tin vay -->
+  <div class="section">
+    <div class="form-group">
+      <label for="loanAmount">Khoản vay</label>
+      <div class="input-with-unit">
+        <input type="text" id="loanAmount" placeholder="0" inputmode="numeric">
+        <span>VNĐ</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="loanTerm">Kỳ hạn</label>
+      <div class="input-with-unit">
+        <input type="text" id="loanTerm" placeholder="0" inputmode="numeric">
+        <span>Tháng</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Lãi suất</label>
+      <div class="input-with-unit">
+        <input type="text" id="interestRateYear" placeholder="0" inputmode="decimal">
+        <span>%/năm</span>
+      </div>
+      <div class="input-with-unit">
+        <input type="text" id="interestRateMonth" placeholder="0" inputmode="decimal" class="input-locked">
+        <span>%/tháng</span>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="btn-view" id="btnViewTable">Xem bảng</button>
+      <button class="btn-fee" id="btnFee">Phí thu hộ</button>
+      <button class="btn-delete" id="btnDeleteAll">Xoá tất cả</button>
+    </div>
+    <div class="button-note-box">
+      <div class="error-note error-empty" id="errorLoan">Vui lòng nhập đủ thông tin</div>
+       <div class="button-note btn-fee-note">
+<!--       <div>Trả mỗi kỳ: <span class="amount">197.607.604 VNĐ</span></div>
+        <div>Phí thu hộ/lần: <span class="amount1">+12.000 VNĐ</span></div>
+        <div>Tổng sau phí: <span class="amount">197.619.604 VNĐ</span></div> -->
+      </div>
+      <div class="button-note btn-view-note">Bảng kết quả</div>
+      <div class="error-note error-empty" id="errorTable">Chưa có bảng trả góp</div>
+      <div class="button-note btn-delete-note">Đã xoá tất cả dữ liệu đã nhập</div>
+    </div>
+  </div>
+
+  <!-- Bảng trả góp -->
+  <div class="table-container">
+    <table id="loanTable">
+      <thead>
+       <tr>
+          <th>No.</th>
+          <th>Trả mỗi kỳ</th>
+          <th>Gốc</th>
+          <th>Lãi suất</th>
+          <th>Số dư</th>
+        </tr>
+      </thead>
+      <tbody>
+<!--        <tr><td>1</td><td>197.607.604</td><td>151.018.021</td><td>46.589.583</td><td>865.481.979</td></tr>
+        <tr><td>2</td><td>197.607.604</td><td>157.939.680</td><td>39.667.924</td><td>707.542.299</td></tr>
+        <tr><td>3</td><td>197.607.604</td><td>165.178.582</td><td>32.429.022</td><td>542.363.717</td></tr>
+        <tr><td>4</td><td>197.607.604</td><td>172.749.267</td><td>24.858.337</td><td>369.614.450</td></tr>
+        <tr><td>5</td><td>197.607.604</td><td>180.666.942</td><td>16.940.662</td><td>188.947.508</td></tr>
+        <tr><td>6</td><td>197.607.604</td><td>188.947.510</td><td>8.660.094</td><td>0</td></tr>
+        <tr>
+          <td>Tổng</td>
+          <td>1.185.645.624</td>
+          <td></td>
+          <td>169.145.622</td>
+          <td></td>
+        </tr> -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Nguyễn Xuân Khuê
+</footer>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+// Ẩn tất cả khi load, chỉ hiện khi mọi thứ sẵn sàng + hiệu ứng fade-in đẹp
+(function() {
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.8s ease-out';
+
+  const blockClicks = document.createElement('div');
+  blockClicks.style.position = 'fixed';
+  blockClicks.style.inset = '0';
+  blockClicks.style.background = '#FFFFFF';
+  blockClicks.style.zIndex = '9999';
+  blockClicks.style.cursor = 'wait';
+  document.body.appendChild(blockClicks);
+
+  function startApp() {
+    if (blockClicks.parentNode) blockClicks.remove();
+    document.body.style.opacity = '1';
+    document.body.style.cursor = 'default';
+  }
+
+  window.addEventListener('load', function() {
+    if (typeof html2canvas === 'undefined') {
+      const checkInterval = setInterval(() => {
+        if (typeof html2canvas !== 'undefined') {
+          clearInterval(checkInterval);
+          setTimeout(startApp, 600);
+        }
+      }, 50);
+      setTimeout(() => { clearInterval(checkInterval); startApp(); }, 8000);
+    } else {
+      setTimeout(startApp, 600);
+    }
+  });
+
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      document.body.style.opacity = '1';
+      if (blockClicks.parentNode) blockClicks.remove();
+    }
+  });
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Ẩn ban đầu
+  const hideOnStart = ['#resultPrepaid','#resultInsurance','#errorProductPrice','#errorPrepaid','#errorInsurance','#errorLoan','#errorTable','.table-container','.btn-view-note','.btn-fee-note','.btn-delete-note','.action-buttons','#btnFee'];
+  hideOnStart.forEach(s => document.querySelectorAll(s).forEach(el => el.style.display = 'none'));
+
+  function show(el) { if(el) el.style.display = 'block'; }
+  function showFlex(el) { if(el) el.style.display = 'flex'; }
+  function hide(el) { if(el) el.style.display = 'none'; }
+
+  function formatVND(num) {
+    if (!num || num <= 0) return '0';
+    return Math.round(num).toLocaleString('vi-VN');
+  }
+  function parseVND(str) {
+    if (!str) return 0;
+    return parseInt(str.replace(/\./g, ''), 10) || 0;
+  }
+
+  // DOM
+  const productPrice      = document.getElementById('productPrice');
+  const prepaidAmount     = document.getElementById('prepaidAmount');
+  const loanAmount        = document.getElementById('loanAmount');
+  const loanTerm          = document.getElementById('loanTerm');
+  const interestRateYear  = document.getElementById('interestRateYear');
+  const interestRateMonth = document.getElementById('interestRateMonth');
+  const insurance         = document.getElementById('insurance');
+  const customerName      = document.getElementById('customerName');
+  const productName       = document.getElementById('productName');
+
+  const btnCalculate      = document.getElementById('btnCalculate');
+  const btnAddInsurance   = document.getElementById('btnAddInsurance');
+  const btnViewTable      = document.getElementById('btnViewTable');
+  const btnFee            = document.getElementById('btnFee');
+  const btnDeleteAll      = document.getElementById('btnDeleteAll');
+  const btnPrint          = document.getElementById('btnPrint');
+  const btnShare          = document.getElementById('btnShare');
+
+  const resultPrepaid     = document.getElementById('resultPrepaid');
+  const resultInsurance   = document.getElementById('resultInsurance');
+  const errorBox          = document.getElementById('errorProductPrice');
+  const errorPrepaid      = document.getElementById('errorPrepaid');
+  const errorInsurance    = document.getElementById('errorInsurance');
+  const errorLoan         = document.getElementById('errorLoan');
+  const errorTable        = document.getElementById('errorTable');
+
+  const tableContainer    = document.querySelector('.table-container');
+  const loanTable         = document.getElementById('loanTable');
+  const btnViewNote       = document.querySelector('.btn-view-note');
+  const btnFeeNote        = document.querySelector('.btn-fee-note');
+  const btnDeleteNote     = document.querySelector('.btn-delete-note');
+  const actionButtons     = document.querySelector('.action-buttons');
+
+  let originalLoanBase = 0;
+  let hasInsurance = false;
+  let hasAppliedFee = false;
+
+  // HÀM RESET BẢNG + TẮT HẾT KẾT QUẢ (dùng chung cho 3 hành động)
+  function resetLoanResults() {
+    loanTable.querySelector('tbody').innerHTML = '';
+    hide(tableContainer);
+    hide(btnViewNote);
+    hide(actionButtons);
+    hide(btnFee);
+    hide(btnFeeNote);
+    hide(errorTable);
+
+    hasAppliedFee = false;
+    if (btnFee) {
+      btnFee.textContent = 'Phí thu hộ';
+      btnFee.disabled = false;
+    }
+  }
+
+  // INPUT CHỐNG 0 ĐẦU
+  function cleanNumberInput(e) {
+    let val = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+    e.target.value = val ? formatVND(val) : '';
+  }
+  [productPrice, prepaidAmount, loanAmount].forEach(i => i.addEventListener('input', cleanNumberInput));
+  loanTerm.addEventListener('input', e => {
+    let val = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+    e.target.value = (val && parseInt(val) > 0) ? val : '';
+  });
+
+  // LÃI SUẤT: 0 OK, 00→09 CẤM, . → 0., max 2 số sau chấm
+  interestRateYear.addEventListener('input', function(e) {
+    let v = e.target.value.replace(/[^0-9.]/g, '');
+    if (v === '.') v = '0.';
+    if (v.includes('.')) {
+      const [int, dec = ''] = v.split('.');
+      v = int + '.' + dec.slice(0, 2);
+    }
+    if (v.length > 1 && v[0] === '0' && v[1] !== '.') {
+      v = '0';
+    }
+    e.target.value = v;
+
+    const num = parseFloat(v) || 0;
+    interestRateMonth.value = num > 0 ? (num / 12).toFixed(2).replace(/\.?0+$/, '') : '';
+  });
+
+  // KHI SỬA SỐ TIỀN VAY → RESET BẢNG
+  loanAmount.addEventListener('input', e => {
+    const currentValue = parseVND(e.target.value);
+    if (currentValue > 0) {
+      originalLoanBase = currentValue;
+      productPrice.value = prepaidAmount.value = '';
+      hide(resultPrepaid);
+      hide(resultInsurance);
+      hide(btnFee);
+      hide(btnFeeNote);
+      insurance.value = '6.6';
+      hasInsurance = false;
+
+      resetLoanResults(); // Ẩn bảng ngay khi sửa tiền vay
+    }
+  });
+
+  // TÍNH TOÁN (TRẢ TRƯỚC)
+  btnCalculate.addEventListener('click', () => {
+    hide(errorBox); hide(errorPrepaid);
+    const price = parseVND(productPrice.value);
+    const prepaid = parseVND(prepaidAmount.value);
+    if (!price || price <= 0) { errorBox.textContent = 'Vui lòng nhập giá sản phẩm!'; show(errorBox); hide(resultPrepaid); return; }
+    if (prepaid > price) { errorPrepaid.textContent = 'Trả trước không được lớn hơn giá sản phẩm!'; show(errorPrepaid); hide(resultPrepaid); return; }
+
+    const remaining = price - prepaid;
+    originalLoanBase = remaining;
+    resultPrepaid.innerHTML = `<div>Trả trước: <span class="percent">${prepaid===0?'0':((prepaid/price)*100).toFixed(1)}%</span></div>
+      <div>Trả góp: <span class="amount">${formatVND(remaining)} VNĐ</span></div>`;
+    show(resultPrepaid);
+    loanAmount.value = formatVND(remaining);
+    hide(resultInsurance); hide(btnFeeNote); hide(btnFee);
+    hasInsurance = false;
+
+    resetLoanResults(); // Ẩn bảng khi nhấn Tính toán
+  });
+
+  // THÊM BẢO HIỂM
+  btnAddInsurance.addEventListener('click', () => {
+    if (!originalLoanBase) { errorInsurance.textContent = 'Vui lòng tính DP trước'; show(errorInsurance); return; }
+    hide(errorInsurance);
+    const rate = parseFloat(insurance.value) || 0;
+    const fee = rate > 0 ? Math.round(originalLoanBase * rate / 100) : 0;
+    const total = originalLoanBase + fee;
+    loanAmount.value = formatVND(total);
+
+    resultInsurance.innerHTML = rate === 0
+      ? `<div>Trả góp: <span class="amount">${formatVND(originalLoanBase)} VNĐ</span></div><div>Không có bảo hiểm</div>`
+      : `<div>Trả góp: <span class="amount">${formatVND(originalLoanBase)} VNĐ</span></div>
+         <div>Thêm BHKV: <span class="percent">${rate}%</span> (<span class="amount1">+${formatVND(fee)} VNĐ</span>)</div>
+         <div>Đã gồm có BHKV: <span class="amount">${formatVND(total)} VNĐ</span></div>`;
+    show(resultInsurance);
+    hide(btnFeeNote); hide(btnFee); hasAppliedFee = false;
+    hasInsurance = true;
+
+    resetLoanResults(); // Ẩn bảng khi thêm BH
+  });
+
+  // XEM BẢNG
+  btnViewTable.addEventListener('click', () => {
+    hide(errorLoan);
+    const P = parseVND(loanAmount.value);
+    const n = parseInt(loanTerm.value);
+    const rAnnual = parseFloat(interestRateYear.value.replace(',', '.')) || 0;
+
+    if (!P || P <= 0 || !n || n <= 0 || interestRateYear.value.trim() === '') {
+      show(errorLoan); hide(tableContainer); return;
+    }
+
+    const r = rAnnual / 100 / 12;
+    let emiFixed = r === 0 ? Math.round(P / n) : Math.round(P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
+
+    let balance = P;
+    let totalPayment = 0;
+    let totalInterest = 0;
+    let rows = '';
+
+    for (let i = 1; i <= n; i++) {
+      let interest = r === 0 ? 0 : Math.round(balance * r);
+      let principal = emiFixed - interest;
+      let emi = emiFixed;
+
+      if (i === n) {
+        principal = balance;
+        emi = principal + interest;
+        let diff = emi - emiFixed;
+        principal -= diff;
+        emi = emiFixed;
+        balance = 0;
+      } else {
+        if (principal > balance) principal = balance;
+        balance -= principal;
+        balance = Math.round(balance);
+      }
+
+      totalPayment += emi;
+      totalInterest += interest;
+
+      rows += `<tr>
+        <td>${i}</td>
+        <td>${formatVND(emi)}</td>
+        <td>${formatVND(principal)}</td>
+        <td>${formatVND(interest)}</td>
+        <td>${i === n ? '0' : formatVND(balance)}</td>
+      </tr>`;
+    }
+
+    rows += `<tr style="font-weight:bold; color:#166534;">
+      <td>Tổng</td>
+      <td>${formatVND(totalPayment)}</td>
+      <td></td>
+      <td>${formatVND(totalInterest)}</td>
+      <td></td>
+    </tr>`;
+
+    loanTable.querySelector('tbody').innerHTML = rows;
+    show(tableContainer);
+    show(btnViewNote);
+    showFlex(actionButtons);
+    show(btnFee);
+    btnFee.textContent = 'Phí thu hộ';
+    btnFee.disabled = false;
+    hasAppliedFee = false;
+    hide(btnFeeNote);
+  });
+
+  // PHÍ THU HỘ – ĐÃ CỘNG +12.000 VÀO CỘT "TRẢ MỖI KỲ" TRONG BẢNG
+  btnFee.addEventListener('click', () => {
+    if (hasAppliedFee) return;
+
+    const emiOld = parseVND(document.querySelector('#loanTable tbody tr:first-child td:nth-child(2)')?.textContent || '0');
+    const emiNew = emiOld + 12000;
+
+    // Cập nhật lại toàn bộ cột "Trả mỗi kỳ" trong bảng
+    document.querySelectorAll('#loanTable tbody tr').forEach((row, index) => {
+      if (index < document.querySelectorAll('#loanTable tbody tr').length - 1) { // bỏ dòng Tổng
+        const cell = row.cells[1]; // cột thứ 2 = Trả mỗi kỳ
+        cell.textContent = formatVND(emiNew);
+        cell.style.fontWeight = 'bold';
+        cell.style.color = '#dc2626';
+      }
+    });
+
+    // Cập nhật dòng Tổng
+    const totalOld = parseVND(document.querySelector('#loanTable tbody tr:last-child td:nth-child(2)')?.textContent || '0');
+    const totalNew = totalOld + (12000 * parseInt(loanTerm.value));
+    document.querySelector('#loanTable tbody tr:last-child td:nth-child(2)').textContent = formatVND(totalNew);
+
+    // Hiển thị ghi chú
+    btnFeeNote.innerHTML = `
+      <div>Trả góp mỗi kỳ: <span class="amount">${formatVND(emiOld)} VNĐ</span></div>
+      <div>Phí thu hộ: <span class="amount1">+12.000 VNĐ</span></div>
+      <div style="font-weight:bold;color:#dc2626;">Tổng mỗi kỳ: <span class="amount">${formatVND(emiNew)} VNĐ</span></div>
+    `;
+    show(btnFeeNote);
+    btnFee.textContent = 'Đã thêm phí';
+    btnFee.disabled = true;
+    hasAppliedFee = true;
+  });
+
+  // IN + SHARE – ĐÃ ĐẸP HOÀN HẢO: SÁT DÒNG, GỌN GÀNG, CHUYÊN NGHIỆP
+  async function captureScreenshot(isShare = false) {
+    const captureArea = document.createElement('div');
+    captureArea.style.position = 'absolute';
+    captureArea.style.left = '-9999px';
+    captureArea.style.top = '0';
+    captureArea.style.width = '794px';
+    captureArea.style.minHeight = '1123px';
+    captureArea.style.padding = '40px';
+    captureArea.style.background = '#fff';
+    captureArea.style.fontFamily = 'Arial, sans-serif';
+    captureArea.style.boxSizing = 'border-box';
+
+    const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const now = new Date();
+    const dayOfWeek = daysOfWeek[now.getDay()];
+    const time12h = now.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).replace(' ', '');
+    const dateTimeStr = `${dayOfWeek}, ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}, ${time12h.toUpperCase()}`;
+    const fileName = `IMG_${String(now.getDate()).padStart(2,'0')}-${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()}_${now.getHours()}h${now.getMinutes()}.png`;
+
+    const prepaidPercent = productPrice.value && prepaidAmount.value ? ((parseVND(prepaidAmount.value) / parseVND(productPrice.value)) * 100).toFixed(1) : '0';
+    const insuranceFee = hasInsurance && insurance.value !== '0' ? Math.round(originalLoanBase * parseFloat(insurance.value) / 100) : 0;
+
+    let infoLines = [];
+
+    infoLines.push(`<div style="margin:3px 0;"><strong>Khách hàng:</strong> ${customerName.value.trim() || 'Chưa nhập'}</div>`);
+    infoLines.push(`<div style="margin:3px 0;"><strong>Sản phẩm:</strong> ${productName.value.trim() || 'Chưa nhập'}</div>`);
+    infoLines.push(`<div style="margin:3px 0;"><strong>Giá sản phẩm:</strong> ${formatVND(parseVND(productPrice.value))} VNĐ</div>`);
+    infoLines.push(`<div style="margin:3px 0;"><strong>Trả trước:</strong> ${formatVND(parseVND(prepaidAmount.value))} VNĐ (${prepaidPercent}%)</div>`);
+
+    if (hasInsurance && insurance.value !== '0') {
+      infoLines.push(`<div style="margin:3px 0;"><strong>Bảo hiểm khoản vay:</strong> ${insurance.value}% (+ ${formatVND(insuranceFee)} VNĐ)</div>`);
+    }
+
+      infoLines.push(`<div style="margin:3px 0;"><strong>Trả góp:</strong><span style="color:#dc2626;"> ${formatVND(parseVND(loanAmount.value))}</span> VNĐ</div>`);
+    
+    infoLines.push(`<div style="margin:3px 0;">
+      <strong>Kỳ hạn:</strong> ${loanTerm.value || 'Chưa chọn'} tháng | 
+      <strong>Lãi suất:</strong> ${interestRateYear.value || '0'}%/năm 
+      (${interestRateMonth.value === '' || parseFloat(interestRateYear.value) === 0 ? '0' : interestRateMonth.value}%/tháng)
+    </div>`);
+
+    if (hasAppliedFee) {
+      infoLines.push(`<div style="margin:3px 0;"><strong>Phí thu hộ:</strong> +12.000 VNĐ / kỳ</div>`);
+    }
+
+    let infoHTML = `
+      <div style="text-align:center;font-size:34px;font-weight:bold;color:#1D4ED8;margin-bottom:8px;">BẢNG TÍNH TRẢ GÓP</div>
+      <div style="text-align:center;color:#555;font-size:17px;margin-bottom:28px;">${dateTimeStr}</div>
+      <div style="background:#f0f8ff;padding:18px 22px;border-radius:12px;line-height:1.4;font-size:16.5px;border-left:7px solid #3b82f6;">
+        ${infoLines.join('')}
+      </div>`;
+
+    const clonedTable = tableContainer.cloneNode(true);
+    clonedTable.style.marginTop = '16px';
+    clonedTable.style.width = '100%';
+    clonedTable.style.fontSize = '15px';
+
+    captureArea.innerHTML = infoHTML;
+    captureArea.appendChild(clonedTable);
+    captureArea.innerHTML += `<div style="text-align:center;margin-top:32px;color:#666;font-size:14px;font-weight:500;">Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ trả góp của chúng tôi. Sự đồng hành của Quý Khách là niềm vinh hạnh lớn nhất!</div>`;
+
+    document.body.appendChild(captureArea);
+
+    try {
+      const canvas = await html2canvas(captureArea, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      document.body.removeChild(captureArea);
+
+      const imgData = canvas.toDataURL('image/png');
+      if (!isShare) {
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = imgData;
+        link.click();
+      } else {
+        canvas.toBlob(blob => {
+          const file = new File([blob], fileName, { type: 'image/png' });
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: 'BẢNG TÍNH TRẢ GÓP' }).catch(() => {});
+          }
+        });
+      }
+    } catch (err) {
+      document.body.removeChild(captureArea);
+      console.error('Lỗi chụp ảnh:', err);
+    }
+  }
+
+  btnPrint.onclick = () => captureScreenshot(false);
+  btnShare.onclick = () => captureScreenshot(true);
+
+  // XÓA TẤT CẢ
+  btnDeleteAll.addEventListener('click', () => {
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.type !== 'button') el.value = el.tagName === 'SELECT' ? '6.6' : '';
+    });
+    interestRateMonth.value = '';
+    originalLoanBase = 0; hasInsurance = false; hasAppliedFee = false;
+    loanTable.querySelector('tbody').innerHTML = '';
+    [resultPrepaid, resultInsurance, tableContainer, btnViewNote, btnFeeNote, actionButtons, btnFee,
+     errorBox, errorPrepaid, errorInsurance, errorLoan].forEach(hide);
+    show(btnDeleteNote);
+    setTimeout(() => hide(btnDeleteNote), 2000);
+  });
+
+});
+</script>
+</body>
+</html>
