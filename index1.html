@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>By NXkhue</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+html { font-size:16px; }
+@media (max-width:480px) { html { font-size:13px; } }
+body { background:#f5f5f5; line-height:1.5; color:#333; }
+
+header { background:#212121; box-shadow:0 4px 8px rgba(196,196,196,0.6); }
+.header-container { position:relative; max-width:1000px; margin:auto; height:60px; }
+.nav-left { position:absolute; left:10px; top:50%; transform:translateY(-50%); }
+.nav-center { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
+.nav-left a, .nav-center a { color:#fff; text-decoration:none; font-weight:bold; }
+
+footer { background:#212121; color:#fff; text-align:center; padding:12px 0; margin-top:20px; }
+
+.container { max-width:1000px; margin:20px auto; background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+
+.form-group { margin-bottom:16px; }
+label { display:block; font-weight:bold; margin-bottom:6px; }
+
+.input-with-unit { position:relative; }
+.input-with-unit span { position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#666; pointer-events:none; }
+input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:1rem; }
+input:focus, select:focus { border-color:#4caf50; outline:none; }
+
+.button-group { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.button-group button { flex:1; padding:10px 16px; border:none; border-radius:4px; font-weight:bold; font-size:1rem; cursor:pointer; transition:0.2s; }
+.button-group button:active { transform:scale(0.98); }
+.btn-view { background:#2563EB; color:#fff; }
+.btn-view:hover { background:#1E40AF; }
+.btn-delete { background:#DC2626; color:#fff; }
+.btn-delete:hover { background:#B91C1C; }
+
+.error-note1 { padding:10px 16px; border-radius:6px; margin-top:8px; font-size:1rem; background:#FEE2E2; border-left:4px solid #DC2626; color:#991B3B; display:none; }
+
+.result-box { background:#F3F4F6; border-left:4px solid #1D4ED8; padding:16px 20px; border-radius:6px; margin-top:12px; line-height:1.7; font-size:1rem; display:none; }
+.result-box .percent { font-weight:bold; color:#3243BF; }
+.result-box .amount1 { font-weight:bold; color:#0891B2; }
+
+.insurance-note { display:flex; align-items:flex-start; background:#F0FDF4; border-left:4px solid #10B981; padding:12px 16px; border-radius:6px; margin-top:12px; gap:8px; font-size:1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="nav-left"><a href="#">Home</a></div>
+    <div class="nav-center"><a href="#">BTTG</a></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="form-group">
+    <label>Sản phẩm vay</label>
+    <select id="productType" class="product-type">
+      <option value="none">Không</option>
+      <option value="cdl_sd">CDL – SD</option>
+      <option value="cdl_hr">CDL – HR</option>
+      <option value="cdl_mix">CDL – Mix</option>
+      <option value="cdl_sdr">CDL – SD Return</option>
+      <option value="cdl_hrr">CDL – HR Return</option>
+      <option value="cdl_mixr">CDL – Mix Return</option>
+      <option value="cdl_xd">CDL – Xây dựng</option>
+      <option value="cdl_promotion">CDL – Promotion</option>
+      <option value="spl">SPL – Service Package Loan</option>
+      <option value="twl_new_ctd1">TWL – (Xe mới) - CTD1</option>
+      <option value="twl_new_ctd2">TWL – (Xe mới) - CTD2</option>
+      <option value="twl_new_ctd3">TWL – (Xe mới) - CTD3</option>
+      <option value="twl_old_ctd">TWL – (Xe cũ) CTD</option>
+      <option value="twl_old_ctd1">TWL – (Xe cũ) NO CTD</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>SD – Standard</label>
+    <select id="sdType" class="sd">
+      <option value="pc">Máy tính bàn (PC)</option>
+      <option value="appliance">Điện máy & điện gia dụng</option>
+      <option value="camera">Máy ảnh, máy quay phim...</option>
+      <option value="watch">Đồng hồ</option>
+      <option value="car_parts">Phụ tùng ôtô</option>
+      <option value="furniture">Nội thất</option>
+      <option value="office">Thiết bị văn phòng</option>
+      <option value="transport">Xe đạp, xe đạp điện...</option>
+      <option value="health">Kính mắt, tròng kính...</option>
+      <option value="car_parts2">Phụ tùng ôtô</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>HR – High Risk</label>
+    <select id="hrProduct" class="poi">
+      <option value="phone">Điện thoại di động</option>
+      <option value="iphone">Iphone</option>
+      <option value="laptop">Laptop</option>
+      <option value="tablet">Máy tính bảng</option>
+      <option value="smartwatch">Đồng hồ thông minh</option>
+      <option value="accessory">Phụ kiện</option>
+      <option value="used">Sản phẩm đã qua sử dụng</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>SD - Xây dựng</label>
+    <select id="xdMaterial" class="poi">
+      <option value="bon_nuoc">Bồn nước</option>
+      <option value="san_go">Sàn gỗ</option>
+      <option value="son">Sơn</option>
+      <option value="tbnlmt">Thiết bị năng lượng mặt trời</option>
+      <option value="tbvs">Thiết bị vệ sinh</option>
+      <option value="gach_men">Gạch men</option>
+      <option value="ngoi">Ngói</option>
+      <option value="tran">Trần</option>
+      <option value="cua_so">Cửa chính, cửa sổ, cửa nhôm</option>
+      <option value="xi_mang">Xi măng</option>
+      <option value="da_xd">Đá xây dựng</option>
+      <option value="cat">Cát</option>
+      <option value="sat_xd">Sắt xây dựng</option>
+      <option value="sat_cuon">Sắt cuộn</option>
+      <option value="thep">Thép</option>
+      <option value="kem">Kẽm</option>
+      <option value="ton">Tôn, la phông, dây điện...</option>
+      <option value="den_tt">Đèn trang trí</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>POI</label>
+    <select id="hrPoi" class="poi">
+      <option value="no">Không</option>
+      <option value="yes">Có</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Giá sản phẩm</label>
+    <div class="input-with-unit">
+      <input type="text" id="productPrice" placeholder="0" inputmode="numeric">
+      <span>VNĐ</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Khách hàng trả trước</label>
+    <div class="input-with-unit">
+      <input type="text" id="prepaidAmount" placeholder="0" inputmode="numeric">
+      <span>VNĐ</span>
+    </div>
+  </div>
+
+  <div class="insurance-note">
+    <div>
+        <strong>Ghi chú:</strong><br>
+        <strong>CDL</strong>: Vay trả góp điện máy, điện tử...<br>
+        <strong>SPL</strong>: Gói dịch vụ (spa, thẩm mỹ, học phí...)<br>
+        <strong>TWL</strong>: Vay xe máy (mới/cũ)<br>
+        <strong>POI</strong>: Chứng minh thu nhập<br>
+        <strong>ST</strong>: Vay ngắn hạn<br>
+        <strong>MT</strong>: Vay dài hạn
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button id="btnCalculate" class="btn-view">Tính</button>
+    <button id="btnClear" class="btn-delete">Xoá tất cả</button>
+  </div>
+
+  <div id="errorEmpty" class="error-note1">Vui lòng nhập giá sản phẩm!</div>
+  <div id="errorPrepaid" class="error-note1">Số tiền trả trước không được lớn hơn giá sản phẩm!</div>
+  <div id="errorCleared" class="error-note1">Đã xoá tất cả dữ liệu</div>
+
+  <!-- Kết quả sẽ được chèn động vào đây, đã ẩn sẵn -->
+  <div id="resultPackage" class="result-box"></div>
+</div>
+
+<footer>Nguyễn Xuân Khuê</footer>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const productType   = document.getElementById("productType");
+
+    // Các nhóm field
+    const sdGroup       = document.querySelector(".form-group:nth-of-type(2)"); // SD – Standard
+    const hrGroup       = document.querySelector(".form-group:nth-of-type(3)"); // HR – High Risk
+    const xdGroup       = document.querySelector(".form-group:nth-of-type(4)"); // SD - Xây dựng
+    const poiGroup      = document.querySelector(".form-group:nth-of-type(5)"); // POI
+
+    const resultBox     = document.getElementById("resultPackage");
+
+    // Ẩn tất cả field phụ
+    function hideAllOptional() {
+        sdGroup.style.display = hrGroup.style.display = xdGroup.style.display = poiGroup.style.display = "none";
+    }
+
+    // Ẩn/hiện đúng 100% theo yêu cầu mới
+    function toggleFields() {
+        hideAllOptional();
+        hideResult();
+
+        const val = productType.value;
+
+        switch (val) {
+            case "cdl_sd":
+            case "cdl_sdr":        // CDL – SD Return
+                sdGroup.style.display = "block";
+                poiGroup.style.display = "block";
+                break;
+
+            case "cdl_hr":
+            case "cdl_hrr":        // CDL – HR Return
+                hrGroup.style.display = "block";
+                poiGroup.style.display = "block";
+                break;
+
+            case "cdl_xd":         // CDL – Xây dựng
+                xdGroup.style.display = "block";
+                poiGroup.style.display = "block";
+                break;
+
+            case "cdl_mix":        // CDL – Mix
+                break; // chỉ hiện giá + trả trước
+
+            case "cdl_promotion":  // CDL – Promotion
+            case "spl":
+            case "twl_new_ctd1":
+            case "twl_new_ctd2":
+            case "twl_new_ctd3":
+            case "twl_old_ctd":
+            case "twl_old_ctd1":
+            case "cdl_mixr":
+                poiGroup.style.display = "block";
+                break;
+        }
+    }
+
+    toggleFields();
+    productType.addEventListener("change", toggleFields);
+
+    // ==============================
+    // === TOÀN BỘ CÔNG THỨC GỐC CỦA BẠN (ĐÃ SỬA LỖI iPHONE 20%) ===
+    // ==============================
+
+    const btnCalculate  = document.getElementById("btnCalculate");
+    const btnClear      = document.getElementById("btnClear");
+    const hrProduct     = document.getElementById("hrProduct");
+    const hrPoi         = document.getElementById("hrPoi");
+    const productPrice  = document.getElementById("productPrice");
+    const prepaidAmount = document.getElementById("prepaidAmount");
+
+    function formatMoney(num) {
+        return num.toLocaleString('en-US') + " VNĐ";
+    }
+
+    function hideErrors() {
+        document.querySelectorAll(".error-note1").forEach(el => el.style.display = "none");
+    }
+
+    function hideResult() {
+        resultBox.style.display = "none";
+    }
+
+    // Xóa tất cả
+    btnClear.addEventListener("click", function () {
+        productType.value = "none";
+        productPrice.value = prepaidAmount.value = "";
+        document.querySelectorAll("select").forEach(s => s.selectedIndex = 0);
+        toggleFields();
+        hideResult();
+        hideErrors();
+        document.getElementById("errorCleared").style.display = "block";
+        setTimeout(() => document.getElementById("errorCleared").style.display = "none", 2500);
+    });
+
+    // Tính gói
+    btnCalculate.addEventListener("click", function () {
+        hideErrors();
+        hideResult();
+
+        let price = parseFloat(productPrice.value.replace(/[^0-9]/g, "")) || 0;
+        if (price <= 0) {
+            document.getElementById("errorEmpty").style.display = "block";
+            return;
+        }
+
+        let prepaid = parseFloat(prepaidAmount.value.replace(/[^0-9]/g, "")) || 0;
+        if (prepaid > price) {
+            document.getElementById("errorPrepaid").style.display = "block";
+            return;
+        }
+
+        let percentPrepaid = Math.round((prepaid / price) * 1000) / 10;
+        let loanAmount = price - prepaid;
+        const val = productType.value;
+
+        // ==================== CDL – Promotion (luôn ưu tiên cao nhất) ====================
+        if (val === "cdl_promotion") {
+            const info = {
+                name: "Promotion",
+                interest: "Tuỳ chương trình khuyến mãi",
+                range: "(Bất kỳ)",
+                loanRange: "Bất kỳ",
+                insurance: "Tuỳ chương trình hợp tác",
+                term: "Bất kỳ",
+                earlyPay: "0%"
+            };
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Phí tất toán: <span>${info.earlyPay}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>Không</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+
+        // ==================== CDL – Mix (808) – ĐÃ TÁI CẤU TRÚC HOÀN HẢO ====================
+        if (val === "cdl_mix") {
+            if (loanAmount < 2000000)  { resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`; resultBox.style.display = "block"; return; }
+            if (loanAmount > 30000000) { resultBox.innerHTML = `<div style="color:#DC2626;">Gói 808 tối đa 30 triệu!</div>`; resultBox.style.display = "block"; return; }
+            if (percentPrepaid < 10)   { resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`; resultBox.style.display = "block"; return; }
+
+            const info = {
+                name: "808",
+                interest: "45%/năm , 3.75%/tháng",
+                range: "(10–70%)",
+                loanRange: "2–30 triệu",
+                insurance: "6.6%",
+                term: "6-24 tháng",
+                earlyPay: "8%"
+            };
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Phí tất toán: <span>${info.earlyPay}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>Không</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+
+        // ==================== CDL – SD (Standard) – ĐÃ TÁI CẤU TRÚC HOÀN TOÀN ====================
+        if (val === "cdl_sd") {
+            const hasPoi = hrPoi.value === "yes";
+
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+            if (loanAmount > 70000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Gói DP tối đa 70 triệu!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+
+            let info = {};
+
+            if (percentPrepaid >= 40) {
+                if (loanAmount < 15000000 && hasPoi) {
+                    info = { name: "Special 1012", interest: "35%/năm , 2.91%/tháng", range: "(40–70%)", loanRange: "2 ≤ Khoản vay < 15 triệu", insurance: "6.6%", term: "6-36 tháng", poi: "Bắt buộc" };
+                } else {
+                    info = { name: "DP 1011", interest: "42%/năm , 3.5%/tháng", range: "(40–70%)", loanRange: "2–70 triệu", insurance: "6.6%", term: "6-36 tháng", poi: "Không" };
+                }
+            }
+            else if (percentPrepaid >= 10) {
+                info = hasPoi
+                    ? { name: "POI 1010", interest: "42%/năm , 3.5%/tháng", range: "(10–70%)", loanRange: "2–70 triệu", insurance: "6.6%", term: "6-36 tháng", poi: "Bắt buộc" }
+                    : { name: "Basic 1009", interest: "49%/năm , 4.08%/tháng", range: "(10–70%)", loanRange: "2–70 triệu", insurance: "6.6%", term: "6-36 tháng", poi: "Không" };
+            }
+            else {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>${info.poi}</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+
+        // ==================== CDL – HR (High Risk) – ĐÃ TÁI CẤU TRÚC HOÀN TOÀN ====================
+        if (val === "cdl_hr" || val === "cdl_hrr") {
+            const hasPoi = hrPoi.value === "yes";
+            const isIphone = hrProduct.value === "iphone";
+
+            // ===== iPHONE RIÊNG – bắt buộc ≥20% =====
+            if (isIphone) {
+                if (loanAmount < 12000000 || loanAmount > 30000000) {
+                    resultBox.innerHTML = `<div style="color:#DC2626;font-weight:bold;">iPhone chỉ hỗ trợ 12–30 triệu!</div>`;
+                    resultBox.style.display = "block"; return;
+                }
+                if (percentPrepaid < 20) {
+                    resultBox.innerHTML = `<div style="color:#DC2626;">iPhone trả trước tối thiểu 20%!</div>`;
+                    resultBox.style.display = "block"; return;
+                }
+
+                const info = percentPrepaid >= 40
+                    ? { name: "DP 1062",    interest: "49%/năm , 4.08%/tháng", range: "(40–70%)", loanRange: "12–30 triệu", insurance: "7%", term: "6-24 tháng", poi: "Không" }
+                    : { name: "Basic 1601", interest: "55%/năm , 4.58%/tháng", range: "(20–70%)", loanRange: "12–30 triệu", insurance: "7%", term: "6-24 tháng", poi: "Không" };
+
+                resultBox.innerHTML = `
+                    <div>Gói: <strong>${info.name}</strong></div>
+                    <div>Lãi suất: <span>${info.interest}</span></div>
+                    <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                    <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                    <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                    <div>Kỳ hạn: <span>${info.term}</span></div>
+                    <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                    <div>POI: <span>${info.poi}</span></div>
+                `;
+                resultBox.style.display = "block"; return;
+            }
+
+            // ===== HR THƯỜNG (không phải iPhone) =====
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+            if (loanAmount > 30000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Tối đa chỉ vay 30 triệu!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+
+            let info = {};
+
+            if (percentPrepaid >= 40) {
+                if (loanAmount <= 15000000 && hasPoi) {
+                    info = { name: "Special 1512", interest: "42%/năm , 3.5%/tháng",  range: "(40–70%)", loanRange: "2–15 triệu", insurance: "6.6%", term: "6-24 tháng", poi: "Bắt buộc" };
+                } else {
+                    info = hasPoi
+                        ? { name: "POI 1510", interest: "49%/năm , 4.08%/tháng", range: "(40–70%)", loanRange: "2–30 triệu", insurance: "6.6%", term: "6-24 tháng", poi: "Bắt buộc" }
+                        : { name: "DP 1511",  interest: "49%/năm , 4.08%/tháng", range: "(40–70%)", loanRange: "2–30 triệu", insurance: "6.6%", term: "6-24 tháng", poi: "Không" };
+                }
+            }
+            else if (percentPrepaid >= 20 || (percentPrepaid >= 10 && hasPoi)) {
+                info = hasPoi
+                    ? { name: "POI 1510",   interest: "49%/năm , 4.08%/tháng", range: "(10–70%)", loanRange: "2–30 triệu", insurance: "6.6%", term: "6-24 tháng", poi: "Bắt buộc" }
+                    : { name: "Basic 1509", interest: "55%/năm , 4.58%/tháng", range: "(20–70%)", loanRange: "2–30 triệu", insurance: "6.6%", term: "6-24 tháng", poi: "Không" };
+            }
+            else {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 20% (hoặc 10% nếu có POI)!</div>`;
+                resultBox.style.display = "block"; return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>${info.poi}</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+
+        // ==================== CDL – SD Return (cdl_sdr) ====================
+        if (val === "cdl_sdr") {
+            const hasPoi = hrPoi.value === "yes";
+
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+            if (loanAmount > 70000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Tối đa chỉ vay 70 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            let info = {};
+
+            if (percentPrepaid >= 40) {
+                if (hasPoi) {
+                    // SPECIAL 1011 – siêu ưu đãi
+                    info = {
+                        name: "SPECIAL 1011",
+                        interest: "29%/năm , 2.42%/tháng",
+                        range: "(40–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "4-36 tháng",
+                        earlyPay: "8%",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // DP 30912
+                    info = {
+                        name: "DP 30912",
+                        interest: "35%/năm , 2.92%/tháng",
+                        range: "(40–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "4-36 tháng",
+                        earlyPay: "8%",
+                        poi: "Không"
+                    };
+                }
+            }
+            else if (percentPrepaid >= 10) {
+                if (hasPoi) {
+                    // POI 30913
+                    info = {
+                        name: "POI 30913",
+                        interest: "35%/năm , 2.92%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "4-36 tháng",
+                        earlyPay: "8%",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // Basic 30910
+                    info = {
+                        name: "Basic 30910",
+                        interest: "42%/năm , 3.5%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "4-36 tháng",
+                        earlyPay: "8%",
+                        poi: "Không"
+                    };
+                }
+            }
+            else {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Phí tất toán: <span>${info.earlyPay}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>${info.poi}</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+        
+        // ==================== CDL – HR Return (cdl_hrr) ====================
+        if (val === "cdl_hrr") {
+            const hasPoi = hrPoi.value === "yes";
+
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+            if (loanAmount > 30000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Tối đa chỉ vay 30 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            let info = {};
+
+            if (percentPrepaid >= 40) {
+                if (hasPoi) {
+                    // SPECIAL 30901 – lãi cực thấp
+                    info = {
+                        name: "SPECIAL 30901",
+                        interest: "35%/năm , 2.92%/tháng",
+                        range: "(40–70%)",
+                        loanRange: "2–30 triệu",
+                        insurance: "6.6%",
+                        term: "4-36 tháng",
+                        earlyPay: "8%",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // DP 30902
+                    info = {
+                        name: "DP 30902",
+                        interest: "39%/năm , 3.25%/tháng",
+                        range: "(40–70%)",
+                        loanRange: "2–30 triệu",
+                        insurance: "6.6%",
+                        term: "4-24 tháng",
+                        earlyPay: "8%",
+                        poi: "Không"
+                    };
+                }
+            }
+            else if (percentPrepaid >= 10) {
+                if (hasPoi) {
+                    // POI 30903
+                    info = {
+                        name: "POI 30903",
+                        interest: "39%/năm , 3.25%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–30 triệu",
+                        insurance: "6.6%",
+                        term: "4-24 tháng",
+                        earlyPay: "8%",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // Basic 30900
+                    info = {
+                        name: "Basic 30900",
+                        interest: "45%/năm , 3.75%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–30 triệu",
+                        insurance: "6.6%",
+                        term: "4-24 tháng",
+                        earlyPay: "8%",
+                        poi: "Không"
+                    };
+                }
+            }
+            else {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Phí tất toán: <span>${info.earlyPay}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>${info.poi}</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+        
+        // ==================== CDL – Mix Return (cdl_mixr) ====================
+        if (val === "cdl_mixr") {
+            const hasPoi = hrPoi.value === "yes"; // vẫn lấy POI để hiển thị, nhưng không ảnh hưởng gói
+
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+            if (loanAmount > 70000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Tối đa chỉ vay 70 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+            if (percentPrepaid < 10) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>MIX 30930</strong></div>
+                <div>Lãi suất: <span>42%/năm , 3.5%/tháng</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">(10–70%)</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(2–70 triệu)</span></div>
+                <div>Phí bảo hiểm: <span>6.6%</span></div>
+                <div>Phí tất toán: <span>8%</span></div>
+                <div>Kỳ hạn: <span>4-36 tháng</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>Không</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+        
+        // ==================== CDL – Xây dựng (cdl_xd) ====================
+        if (val === "cdl_xd") {
+            const hasPoi = hrPoi.value === "yes";
+
+            if (loanAmount < 2000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Khoản vay tối thiểu 2 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+            if (loanAmount > 70000000) {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Tối đa chỉ vay 70 triệu!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            let info = {};
+
+            if (percentPrepaid >= 50) {
+                if (loanAmount < 15000000 && hasPoi) {
+                    // Special 1114 – chỉ áp dụng khoản vay < 15 triệu + có POI
+                    info = {
+                        name: "Special 1114",
+                        interest: "35%/năm , 2.92%/tháng",
+                        range: "(50–70%)",
+                        loanRange: "2 ≤ Khoản vay < 15 triệu",
+                        insurance: "6.6%",
+                        term: "6-36 tháng",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // DP 1113
+                    info = {
+                        name: "DP 1113",
+                        interest: "42%/năm , 3.5%/tháng",
+                        range: "(50–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "6-36 tháng",
+                        poi: "Không"
+                    };
+                }
+            }
+            else if (percentPrepaid >= 10) {
+                if (hasPoi) {
+                    // POI 1112
+                    info = {
+                        name: "POI 1112",
+                        interest: "42%/năm , 3.5%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "6-36 tháng",
+                        poi: "Bắt buộc"
+                    };
+                } else {
+                    // Basic 1111
+                    info = {
+                        name: "Basic 1111",
+                        interest: "49%/năm , 4.08%/tháng",
+                        range: "(10–70%)",
+                        loanRange: "2–70 triệu",
+                        insurance: "6.6%",
+                        term: "6-36 tháng",
+                        poi: "Không"
+                    };
+                }
+            }
+            else {
+                resultBox.innerHTML = `<div style="color:#DC2626;">Trả trước tối thiểu 10%!</div>`;
+                resultBox.style.display = "block";
+                return;
+            }
+
+            resultBox.innerHTML = `
+                <div>Gói: <strong>${info.name}</strong></div>
+                <div>Lãi suất: <span>${info.interest}</span></div>
+                <div>Trả trước: <span class="percent">${percentPrepaid}%</span> <span style="color:#666;">${info.range}</span></div>
+                <div>Khoản vay: <span class="amount1">${formatMoney(loanAmount)}</span> <span style="color:#666;">(${info.loanRange})</span></div>
+                <div>Phí bảo hiểm: <span>${info.insurance}</span></div>
+                <div>Kỳ hạn: <span>${info.term}</span></div>
+                <div>Hồ sơ: CCCD (Chip/Thường) + POA + Ảnh khách</div>
+                <div>POI: <span>${info.poi}</span></div>
+            `;
+            resultBox.style.display = "block";
+            return;
+        }
+        
+        // Các gói khác chưa hỗ trợ
+        resultBox.innerHTML = `<div style="color:#2563EB;">Chưa hỗ trợ tính gói này.</div>`;
+        resultBox.style.display = "block";
+    });
+
+    // Ẩn kết quả khi thay đổi input
+    const inputsToWatch = [productType, hrProduct, hrPoi, productPrice, prepaidAmount];
+    inputsToWatch.forEach(input => {
+        if (input) {
+            input.addEventListener("change", hideResult);
+            input.addEventListener("input", hideResult);
+            input.addEventListener("keyup", hideResult);
+        }
+    });
+
+    // Format tiền tự động
+    [productPrice, prepaidAmount].forEach(input => {
+            input.addEventListener("input", function () {
+                let v = this.value.replace(/[^0-9]/g, "");
+                if (v) {
+                    // Dùng en-US → ra dấu phẩy
+                    this.value = parseInt(v).toLocaleString("en-US");
+                } else {
+                    this.value = "";
+                }
+            });
+        });
+});
+</script>
+</body>
+</html>
